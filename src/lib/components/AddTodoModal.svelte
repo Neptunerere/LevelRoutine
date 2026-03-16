@@ -2,6 +2,7 @@
   import { todos } from '$lib/stores/todos';
   import { createEventDispatcher } from 'svelte';
   import MemberAvatars from './MemberAvatars.svelte';
+  import { t } from '$lib/i18n/index.js';
 
   export let editTodo = null;
   export let presetDate = '';
@@ -26,22 +27,22 @@
   let startDate = editTodo?.startDate ?? presetDate ?? '';
   let endDate   = editTodo?.endDate   ?? '';
 
-  const typeOptions = [
-    { value: 'single', label: '당일', icon: '◎', desc: '특정 날 하루' },
-    { value: 'timed',  label: '시간', icon: '⏱', desc: '시작·종료 시간' },
-    { value: 'range',  label: '기간', icon: '↔', desc: '여러 날 걸침' }
+  $: typeOptions = [
+    { value: 'single', label: $t.modal.typeSingle, icon: '◎', desc: $t.modal.typeDescSingle },
+    { value: 'timed',  label: $t.modal.typeTimed,  icon: '⏱', desc: $t.modal.typeDescTimed },
+    { value: 'range',  label: $t.modal.typeRange,  icon: '↔', desc: $t.modal.typeDescRange }
   ];
-  const priorities = [
-    { value: 'high',   label: '긴급', color: 'var(--high)' },
-    { value: 'medium', label: '보통', color: 'var(--medium)' },
-    { value: 'low',    label: '여유', color: 'var(--low)' }
+  $: priorities = [
+    { value: 'high',   label: $t.modal.prioHigh,   color: 'var(--high)' },
+    { value: 'medium', label: $t.modal.prioMedium, color: 'var(--medium)' },
+    { value: 'low',    label: $t.modal.prioLow,    color: 'var(--low)' }
   ];
-  const categories = [
-    { value: 'personal', label: '개인', icon: '✨' },
-    { value: 'work',     label: '업무', icon: '💼' },
-    { value: 'health',   label: '건강', icon: '💚' },
-    { value: 'study',    label: '학습', icon: '📚' },
-    { value: 'other',    label: '기타', icon: '🎯' }
+  $: categories = [
+    { value: 'personal', label: $t.categories.personal, icon: '✨' },
+    { value: 'work',     label: $t.categories.work,     icon: '💼' },
+    { value: 'health',   label: $t.categories.health,   icon: '💚' },
+    { value: 'study',    label: $t.categories.study,    icon: '📚' },
+    { value: 'other',    label: $t.categories.other,    icon: '🎯' }
   ];
 
   function addMember() {
@@ -108,7 +109,7 @@
   <div class="modal" on:click|stopPropagation on:keydown role="dialog">
 
     <div class="modal-header">
-      <h2>{editTodo ? '일정 수정' : '새 일정'}</h2>
+      <h2>{editTodo ? $t.modal.editTodo : $t.modal.newTodo}</h2>
       <button class="close-btn" on:click={() => dispatch('close')}>
         <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
@@ -129,46 +130,46 @@
 
       <!-- 제목 -->
       <div class="field">
-        <label for="title">제목</label>
-        <input id="title" type="text" bind:value={title} placeholder="어떤 일정인가요?" autofocus />
+        <label for="title">{$t.modal.title}</label>
+        <input id="title" type="text" bind:value={title} placeholder={$t.modal.titlePlaceholder} autofocus />
       </div>
 
       <!-- 메모 -->
       <div class="field">
-        <label for="desc">메모</label>
-        <textarea id="desc" bind:value={description} placeholder="추가 설명 (선택)" rows="2"></textarea>
+        <label for="desc">{$t.modal.memo}</label>
+        <textarea id="desc" bind:value={description} placeholder={$t.modal.memoPlaceholder} rows="2"></textarea>
       </div>
 
       <!-- 날짜/시간 -->
       {#if scheduleType === 'single'}
         <div class="field">
-          <label for="due">날짜</label>
+          <label for="due">{$t.modal.date}</label>
           <input id="due" type="date" bind:value={dueDate} />
         </div>
       {:else if scheduleType === 'timed'}
         <div class="date-time-row">
           <div class="field flex-2">
-            <label for="timed-date">날짜</label>
+            <label for="timed-date">{$t.modal.date}</label>
             <input id="timed-date" type="date" bind:value={dueDate} />
           </div>
           <div class="field flex-1">
-            <label for="start-time">시작</label>
+            <label for="start-time">{$t.modal.startTime}</label>
             <input id="start-time" type="time" bind:value={startTime} />
           </div>
           <div class="field flex-1">
-            <label for="end-time">종료</label>
+            <label for="end-time">{$t.modal.endTime}</label>
             <input id="end-time" type="time" bind:value={endTime} />
           </div>
         </div>
       {:else}
         <div class="date-time-row">
           <div class="field flex-1">
-            <label for="start-date">시작일</label>
+            <label for="start-date">{$t.modal.startDate}</label>
             <input id="start-date" type="date" bind:value={startDate} />
           </div>
           <div class="range-arrow">→</div>
           <div class="field flex-1">
-            <label for="end-date">종료일</label>
+            <label for="end-date">{$t.modal.endDate}</label>
             <input id="end-date" type="date" bind:value={endDate} />
           </div>
         </div>
@@ -176,7 +177,7 @@
 
       <!-- 온라인/오프라인 -->
       <div class="field">
-        <label>진행 방식</label>
+        <label>{$t.modal.meetingType}</label>
         <div class="meeting-toggle">
           <button class="mtoggle-btn" class:active-offline={meetingType === 'offline'} on:click={() => meetingType = 'offline'}>
             <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
@@ -198,29 +199,29 @@
       <!-- 온라인 URL -->
       {#if meetingType === 'online'}
         <div class="field" style="animation: fadeIn 0.18s ease">
-          <label for="meeting-url">미팅 링크</label>
+          <label for="meeting-url">{$t.modal.meetingUrl}</label>
           <div class="url-input-wrap">
             <svg viewBox="0 0 16 16" fill="none" width="13" height="13" class="url-icon"><path d="M6.5 9.5a4.24 4.24 0 006 0l2-2a4.24 4.24 0 00-6-6L7 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9.5 6.5a4.24 4.24 0 00-6 0l-2 2a4.24 4.24 0 006 6L9 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            <input id="meeting-url" type="url" bind:value={meetingUrl} placeholder="https://zoom.us/j/..." />
+            <input id="meeting-url" type="url" bind:value={meetingUrl} placeholder={$t.modal.meetingPlaceholder} />
           </div>
         </div>
       {/if}
 
       <!-- ── 반복 ── -->
       <div class="field">
-        <label>반복</label>
+        <label>{$t.modal.repeat}</label>
         <div class="repeat-row">
           <div class="repeat-select-wrap">
             <select bind:value={repeatType} class="repeat-select">
-              <option value="none">반복 없음</option>
-              <option value="daily">매일</option>
-              <option value="weekly">매주</option>
-              <option value="monthly">매월</option>
+              <option value="none">{$t.modal.repeatNone}</option>
+              <option value="daily">{$t.modal.repeatDaily}</option>
+              <option value="weekly">{$t.modal.repeatWeekly}</option>
+              <option value="monthly">{$t.modal.repeatMonthly}</option>
             </select>
           </div>
           {#if repeatType !== 'none'}
             <div class="field flex-1" style="animation: fadeIn 0.15s ease">
-              <label for="repeat-until">반복 종료일</label>
+              <label for="repeat-until">{$t.modal.repeatUntil}</label>
               <input id="repeat-until" type="date" bind:value={repeatUntil} />
             </div>
           {/if}
@@ -229,7 +230,7 @@
 
       <!-- ── 참여자 ── -->
       <div class="field">
-        <label>참여자</label>
+        <label>{$t.modal.members}</label>
         <div class="member-input-row">
           <div class="member-input-wrap">
             <svg viewBox="0 0 16 16" fill="none" width="13" height="13" class="member-icon">
@@ -240,10 +241,10 @@
               type="text"
               bind:value={memberInput}
               on:keydown={onMemberKeydown}
-              placeholder="이름 입력 후 Enter"
+              placeholder={$t.modal.memberPlaceholder}
             />
           </div>
-          <button class="member-add-btn" on:click={addMember} disabled={!memberInput.trim()}>추가</button>
+          <button class="member-add-btn" on:click={addMember} disabled={!memberInput.trim()}>{$t.modal.memberAdd}</button>
         </div>
 
         {#if members.length > 0}
@@ -266,7 +267,7 @@
       <!-- 우선순위 + 카테고리 -->
       <div class="two-col">
         <div class="field">
-          <label>우선순위</label>
+          <label>{$t.modal.priority}</label>
           <div class="chips">
             {#each priorities as p}
               <button class="chip" class:active={priority === p.value} style="--c:{p.color}" on:click={() => priority = p.value}>{p.label}</button>
@@ -274,7 +275,7 @@
           </div>
         </div>
         <div class="field">
-          <label>카테고리</label>
+          <label>{$t.modal.category}</label>
           <div class="chips">
             {#each categories as c}
               <button class="chip" class:active={category === c.value} style="--c:var(--{c.value})" on:click={() => category = c.value}>{c.icon} {c.label}</button>
@@ -284,8 +285,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn-cancel" on:click={() => dispatch('close')}>취소</button>
-        <button class="btn-submit" on:click={handleSubmit} disabled={!title.trim()}>{editTodo ? '저장' : '추가'}</button>
+        <button class="btn-cancel" on:click={() => dispatch('close')}>{$t.common.cancel}</button>
+        <button class="btn-submit" on:click={handleSubmit} disabled={!title.trim()}>{editTodo ? $t.common.save : $t.common.add}</button>
       </div>
     </div>
   </div>

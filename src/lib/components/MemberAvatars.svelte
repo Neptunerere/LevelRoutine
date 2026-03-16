@@ -52,7 +52,7 @@
           margin-left: {-Math.round(size * 0.3)}px;
           z-index: 0;
         "
-        title="+{extra}명 더"
+        title="+{extra}"
       >
         +{extra}
       </span>
@@ -65,6 +65,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    overflow: visible;
+    flex-shrink: 0;
   }
 
   .av {

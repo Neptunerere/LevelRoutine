@@ -2,6 +2,7 @@
   import { profile, levelInfo } from '$lib/stores/profile';
   import { createEventDispatcher, onMount } from 'svelte';
   import ImageCropModal from './ImageCropModal.svelte';
+  import { t } from '$lib/i18n/index.js';
 
   const dispatch = createEventDispatcher();
 
@@ -104,8 +105,8 @@
     <div class="levelup-toast">
       <span class="levelup-icon">⚡</span>
       <div>
-        <p class="levelup-title">레벨 업!</p>
-        <p class="levelup-sub">Lv.{$levelInfo.level} {$levelInfo.title} 달성!</p>
+        <p class="levelup-title">{$t.levelUp.title}</p>
+        <p class="levelup-sub">{$t.levelUp.sub($levelInfo.level, $levelInfo.title)}</p>
       </div>
     </div>
   {/if}

@@ -1,5 +1,6 @@
 import { get } from 'svelte/store';
 import { todos } from './todos.js';
+import { t } from '$lib/i18n/index.js';
 
 let notifyFn = null;
 
@@ -44,6 +45,7 @@ export function startNotificationChecker() {
 function checkDeadlines() {
   if (!notifyFn) return;
 
+  const _t = get(t);
   const now = new Date();
   const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const pad = n => String(n).padStart(2, '0');
@@ -60,7 +62,7 @@ function checkDeadlines() {
     if (dueDate === tomorrowStr) {
       const key = `notified-d1-${t.id}-${tomorrowStr}`;
       if (!sessionStorage.getItem(key)) {
-        notifyFn({ title: '📅 내일 마감', body: `"${t.title}" 내일까지예요!` });
+        const _t = get(t); notifyFn({ title: _t.card.notifD1Title ?? '📅 내일 마감', body: `"${t.title}" ${_t.card.notifD1Body ?? '내일까지예요!'}` });
         sessionStorage.setItem(key, '1');
       }
     }
@@ -69,7 +71,7 @@ function checkDeadlines() {
     if (dueDate === todayStr) {
       const key = `notified-d0-${t.id}-${todayStr}`;
       if (!sessionStorage.getItem(key)) {
-        notifyFn({ title: '🔴 오늘 마감!', body: `"${t.title}" 오늘까지예요!` });
+        notifyFn({ title: '🔴 ' + (_t.card.today ?? '오늘') + ' 마감!', body: `"${t.title}" ${_t.card.today ?? '오늘'}까지예요!` });
         sessionStorage.setItem(key, '1');
       }
     }
@@ -82,7 +84,7 @@ function checkDeadlines() {
       if (diffMin >= 29 && diffMin <= 31) {
         const key = `notified-30m-${t.id}-${todayStr}`;
         if (!sessionStorage.getItem(key)) {
-          notifyFn({ title: '⏰ 30분 후 시작', body: `"${t.title}" ${t.startTime} 시작` });
+          notifyFn({ title: '⏰ 30min', body: `"${t.title}" ${t.startTime}` });
           sessionStorage.setItem(key, '1');
         }
       }

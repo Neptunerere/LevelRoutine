@@ -1,5 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import { profile } from './profile.js';
+import { t } from '$lib/i18n/index.js';
 
 const _attendance = writable(null);
 
@@ -58,9 +59,11 @@ export const attendance = {
     _save(next);
 
     // XP 지급 — 프로필 로드 후에만 실행됨
+    const _t = get(t);
+    const isEn = _t.common.add === 'Add';
     const reason = newStreak >= 3
-      ? `출석 체크 (${newStreak}일 연속) ✨ ${newStreak}일 보너스!`
-      : `출석 체크 (${newStreak}일 연속)`;
+      ? (isEn ? `Attendance (${newStreak} days) ✨ Bonus!` : `출석 체크 (${newStreak}일 연속) ✨ ${newStreak}일 보너스!`)
+      : (isEn ? `Attendance (${newStreak} day streak)` : `출석 체크 (${newStreak}일 연속)`);
     profile.addXp(20, reason);
   },
 };

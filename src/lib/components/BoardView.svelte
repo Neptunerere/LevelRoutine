@@ -2,17 +2,18 @@
   import { todos } from '$lib/stores/todos';
   import { createEventDispatcher } from 'svelte';
   import MemberAvatars from './MemberAvatars.svelte';
+  import { t } from '$lib/i18n/index.js';
 
   export let onAddWithDate = null;
 
   const dispatch = createEventDispatcher();
 
   // 보드 컬럼 정의
-  const columns = [
-    { id: 'todo',       label: '할 일',    icon: '○', color: '#9999bb' },
-    { id: 'inprogress', label: '진행 중',  icon: '◐', color: '#5cb4ff' },
-    { id: 'done',       label: '완료',     icon: '●', color: '#5cffb0' },
-    { id: 'hold',       label: '보류',     icon: '⊘', color: '#ffaa5c' },
+  $: columns = [
+    { id: 'todo',       label: $t.board.todo,       icon: '○', color: '#9999bb' },
+    { id: 'inprogress', label: $t.board.inprogress, icon: '◐', color: '#5cb4ff' },
+    { id: 'done',       label: $t.board.done,       icon: '●', color: '#5cffb0' },
+    { id: 'hold',       label: $t.board.hold,       icon: '⊘', color: '#ffaa5c' },
   ];
 
   const categoryColors = { work: '#7c6af5', personal: '#f57cb4', health: '#5cffb0', study: '#5cb4ff', other: '#ffaa5c' };

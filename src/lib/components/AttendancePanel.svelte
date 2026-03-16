@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { attendance, attendanceInfo } from '$lib/stores/attendance';
+  import { t } from '$lib/i18n/index.js';
 
   let showStreak = false;
   let justChecked = false;
@@ -35,8 +36,8 @@
   <div class="streak-toast">
     <span class="streak-fire">🔥</span>
     <div>
-      <p class="streak-title">출석 완료!</p>
-      <p class="streak-sub">{$attendanceInfo.streak}일 연속 출석 · +20 XP</p>
+      <p class="streak-title">{$t.attendance.toastTitle}</p>
+      <p class="streak-sub">{$t.attendance.toastSub($attendanceInfo.streak)}</p>
     </div>
   </div>
 {/if}
@@ -45,7 +46,7 @@
   <div class="att-header">
     <div class="att-title-row">
       <span class="att-icon">🔥</span>
-      <span class="att-title">출석 스트릭</span>
+      <span class="att-title">{$t.attendance.streak}</span>
     </div>
     <div class="att-streak">
       <span class="streak-num">{$attendanceInfo.streak}</span>
@@ -64,9 +65,9 @@
   </div>
 
   <div class="att-footer">
-    <span class="total-days">누적 <strong>{$attendanceInfo.totalDays}일</strong></span>
+    <span class="total-days">{$t.attendance.total} <strong>{$attendanceInfo.totalDays}{$t.attendance.days}</strong></span>
     {#if $attendanceInfo.isToday}
-      <span class="checked-badge">✓ 오늘 출석</span>
+      <span class="checked-badge">{$t.attendance.checkedIn}</span>
     {/if}
   </div>
 </div>

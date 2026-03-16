@@ -1,5 +1,6 @@
 <script>
   import { filteredTodos, todos, filter, selectedCategory, searchQuery, stats, loadTodos, loading, dbError } from '$lib/stores/todos';
+  import { t, locale, setLocale } from '$lib/i18n/index.js';
   import { loadProfile } from '$lib/stores/profile';
   import { loadAttendance } from '$lib/stores/attendance';
   import { initNotifications, startNotificationChecker } from '$lib/stores/notifications';
@@ -27,18 +28,21 @@
   function openEdit(todo) { editTodo = todo; showModal = true; }
   function closeModal() { showModal = false; editTodo = null; presetDate = ''; }
   function openAddWithDate(date) { presetDate = date; showModal = true; }
+  function switchLocale(l) { setLocale(l); location.reload(); }
 
   const today = new Date();
-  const dayNames = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+  $: dayNames = $locale === 'en'
+    ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+    : ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-  const categories = [
-    { value: 'all',      label: '전체', icon: '◉' },
-    { value: 'personal', label: '개인', icon: '✨' },
-    { value: 'work',     label: '업무', icon: '💼' },
-    { value: 'health',   label: '건강', icon: '💚' },
-    { value: 'study',    label: '학습', icon: '📚' },
-    { value: 'other',    label: '기타', icon: '🎯' }
+  $: categories = [
+    { value: 'all',      label: $t.categories.all,      icon: '◉' },
+    { value: 'personal', label: $t.categories.personal, icon: '✨' },
+    { value: 'work',     label: $t.categories.work,     icon: '💼' },
+    { value: 'health',   label: $t.categories.health,   icon: '💚' },
+    { value: 'study',    label: $t.categories.study,    icon: '📚' },
+    { value: 'other',    label: $t.categories.other,    icon: '🎯' }
   ];
 
   $: todayStr = today.toISOString().split('T')[0];
@@ -86,7 +90,7 @@
           <span class="today-pct">{todayTodos.length ? Math.round(todayDone/todayTodos.length*100) : 0}%</span>
         </div>
       {:else}
-        <p class="today-empty">오늘 일정 없음</p>
+        <p class="today-empty">{$t.sidebar.noTodaySchedule}</p>
       {/if}
     </div>
 
@@ -94,15 +98,15 @@
     <AttendancePanel />
 
     <div class="stats-row">
-      <div class="stat"><span class="stat-n accent">{$stats.active}</span><span class="stat-l">진행중</span></div>
+      <div class="stat"><span class="stat-n accent">{$stats.active}</span><span class="stat-l">{$t.sidebar.active}</span></div>
       <div class="stat-div"></div>
-      <div class="stat"><span class="stat-n green">{$stats.completed}</span><span class="stat-l">완료</span></div>
+      <div class="stat"><span class="stat-n green">{$stats.completed}</span><span class="stat-l">{$t.sidebar.completed}</span></div>
       <div class="stat-div"></div>
-      <div class="stat"><span class="stat-n red">{$stats.highPriority}</span><span class="stat-l">긴급</span></div>
+      <div class="stat"><span class="stat-n red">{$stats.highPriority}</span><span class="stat-l">{$t.sidebar.urgent}</span></div>
     </div>
 
     <nav class="cat-nav">
-      <p class="nav-section">카테고리</p>
+      <p class="nav-section">{$t.sidebar.category}</p>
       {#each categories as cat}
         <button
           class="cat-btn"
@@ -122,7 +126,7 @@
       <svg viewBox="0 0 16 16" fill="none" width="18" height="18">
         <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
       </svg>
-      새 일정 추가
+      {$t.sidebar.addSchedule}
     </button>
   </aside>
 
@@ -133,11 +137,11 @@
       <div class="view-tabs">
         <button class="vtab" class:active={activeView === 'list'} on:click={() => activeView = 'list'}>
           <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M2 4h12M2 8h8M2 12h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          리스트
+          {$t.views.list}
         </button>
         <button class="vtab" class:active={activeView === 'calendar'} on:click={() => activeView = 'calendar'}>
           <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><rect x="2" y="3" width="12" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M5 2v2M11 2v2M2 7h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          캘린더
+          {$t.views.calendar}
         </button>
         <button class="vtab" class:active={activeView === 'board'} on:click={() => activeView = 'board'}>
           <svg viewBox="0 0 16 16" fill="none" width="14" height="14">
@@ -145,14 +149,20 @@
             <rect x="6.5" y="2" width="4" height="9" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
             <rect x="11.5" y="2" width="3" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
           </svg>
-          보드
+          {$t.views.board}
         </button>
+      </div>
+
+      <!-- 언어 토글 -->
+      <div class="lang-toggle">
+        <button class="lang-btn" class:active={$locale === 'ko'} on:click={() => switchLocale('ko')}>KR</button>
+        <button class="lang-btn" class:active={$locale === 'en'} on:click={() => switchLocale('en')}>EN</button>
       </div>
 
       {#if activeView === 'list'}
         <div class="search-box">
           <svg viewBox="0 0 16 16" fill="none" width="14" height="14" class="s-icon"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-          <input type="text" placeholder="검색..." bind:value={$searchQuery} />
+          <input type="text" placeholder={$t.common.search} bind:value={$searchQuery} />
           {#if $searchQuery}
             <button class="s-clear" on:click={() => searchQuery.set('')}>×</button>
           {/if}
@@ -162,7 +172,7 @@
       {#if activeView === 'board'}
         <div class="board-hint">
           <svg viewBox="0 0 14 14" fill="none" width="12" height="12"><path d="M7 1l1.5 3.5L12 5l-2.5 2.5.6 3.5L7 9.5 3.9 11l.6-3.5L2 5l3.5-.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
-          카드를 드래그해서 이동하세요
+          {$t.views.dragHint}
         </div>
       {/if}
     </header>
@@ -170,28 +180,28 @@
     {#if $dbError}
       <div class="db-error">
         <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3M8 10v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        DB 연결 오류: {$dbError}
+        {$t.dbError}: {$dbError}
       </div>
     {/if}
 
     {#if $loading}
       <div class="db-loading">
         <div class="spinner"></div>
-        <span>불러오는 중...</span>
+        <span>{$t.common.loading}</span>
       </div>
     {:else if activeView === 'list'}
       <div class="filter-tabs">
-        {#each [['all','전체'], ['active','진행중'], ['completed','완료']] as [v, l]}
+        {#each [['all', $t.filter.all], ['active', $t.filter.active], ['completed', $t.filter.completed]] as [v, l]}
           <button class="ftab" class:active={$filter === v} on:click={() => filter.set(v)}>{l}</button>
         {/each}
-        <span class="filter-count">{$filteredTodos.length}개</span>
+        <span class="filter-count">{$t.list.count($filteredTodos.length)}</span>
       </div>
       <div class="list">
         {#if $filteredTodos.length === 0}
           <div class="empty">
             <div class="empty-emoji">{$filter === 'completed' ? '🎉' : '📋'}</div>
-            <p>{$filter === 'completed' ? '완료된 일정이 없어요' : '일정이 없어요'}</p>
-            <span>새 일정을 추가해보세요</span>
+            <p>{$filter === 'completed' ? $t.list.emptyCompleted : $t.list.empty}</p>
+            <span>{$t.list.emptyHint}</span>
           </div>
         {:else}
           {#each $filteredTodos as todo (todo.id)}
@@ -299,6 +309,11 @@
   .search-box input::placeholder { color: var(--text-3); }
   .s-clear { color: var(--text-3); font-size: 16px; cursor: pointer; background: none; border: none; transition: color 0.15s; }
   .s-clear:hover { color: var(--text); }
+
+  .lang-toggle { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 2px; gap: 2px; margin-left: auto; }
+  .lang-btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: var(--text-3); background: none; border: none; cursor: pointer; transition: all 0.15s; }
+  .lang-btn:hover { color: var(--text); }
+  .lang-btn.active { background: var(--surface-2); color: var(--text); }
 
   .board-hint { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-3); }
 

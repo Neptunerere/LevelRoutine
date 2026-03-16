@@ -1,6 +1,7 @@
 import { writable, derived, get } from 'svelte/store';
+import { locale } from '$lib/i18n/index.js';
 
-const LEVEL_TABLE = [
+const LEVEL_TABLE_KO = [
   { level: 1,  title: '루키',       xpNeeded: 175 },
   { level: 2,  title: '아마추어',   xpNeeded: 300 },
   { level: 3,  title: '어시스턴트', xpNeeded: 450 },
@@ -13,7 +14,22 @@ const LEVEL_TABLE = [
   { level: 10, title: '레전드',     xpNeeded: 9999 },
 ];
 
+const LEVEL_TABLE_EN = [
+  { level: 1,  title: 'Rookie',      xpNeeded: 175 },
+  { level: 2,  title: 'Amateur',     xpNeeded: 300 },
+  { level: 3,  title: 'Assistant',   xpNeeded: 450 },
+  { level: 4,  title: 'Junior',      xpNeeded: 650 },
+  { level: 5,  title: 'Regular',     xpNeeded: 900 },
+  { level: 6,  title: 'Senior',      xpNeeded: 1200 },
+  { level: 7,  title: 'Expert',      xpNeeded: 1600 },
+  { level: 8,  title: 'Master',      xpNeeded: 2100 },
+  { level: 9,  title: 'Champion',    xpNeeded: 2700 },
+  { level: 10, title: 'Legend',      xpNeeded: 9999 },
+];
+
 function calcLevel(totalXp) {
+  const lang = (typeof localStorage !== 'undefined' && localStorage.getItem('sched-lang')) || 'ko';
+  const LEVEL_TABLE = lang === 'en' ? LEVEL_TABLE_EN : LEVEL_TABLE_KO;
   let accumulated = 0;
   for (const row of LEVEL_TABLE) {
     if (totalXp < accumulated + row.xpNeeded) {
@@ -58,12 +74,12 @@ export async function loadProfile() {
       });
     } else {
       // DB에 데이터 없으면 기본값
-      _profile.set({ nickname: '유저', avatarUrl: null, totalXp: 0, xpLog: [] });
+      _profile.set({ nickname: 'User', avatarUrl: null, totalXp: 0, xpLog: [] });
     }
     _loaded = true;
   } catch (e) {
     console.error('loadProfile:', e);
-    _profile.set({ nickname: '유저', avatarUrl: null, totalXp: 0, xpLog: [] });
+    _profile.set({ nickname: 'User', avatarUrl: null, totalXp: 0, xpLog: [] });
   } finally {
     profileLoading.set(false);
   }

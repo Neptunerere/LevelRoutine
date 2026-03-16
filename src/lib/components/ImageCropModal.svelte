@@ -1,5 +1,6 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
+  import { t } from '$lib/i18n/index.js';
 
   export let imageSrc = ''; // base64 or blob URL
 
@@ -135,7 +136,7 @@
 <div class="overlay" on:click|self={cancel} role="presentation" on:keydown>
   <div class="modal">
     <div class="modal-header">
-      <h3>프로필 사진 크롭</h3>
+      <h3>{$t.common.add === 'Add' ? 'Crop Profile Photo' : '프로필 사진 크롭'}</h3>
       <button class="close-btn" on:click={cancel}>
         <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
@@ -179,15 +180,15 @@
           <div class="resize-handle" on:mousedown={onResizeDown} role="button" tabindex="0" on:keydown></div>
         </div>
       {:else}
-        <div class="loading">이미지 로딩 중...</div>
+        <div class="loading">{$t.common.loading}</div>
       {/if}
     </div>
 
-    <p class="hint">박스를 드래그해서 위치 조정 · 오른쪽 하단 핸들로 크기 조정</p>
+    <p class="hint">{$t.common.add === 'Add' ? 'Drag to reposition · Resize with bottom-right handle' : '박스를 드래그해서 위치 조정 · 오른쪽 하단 핸들로 크기 조정'}</p>
 
     <div class="modal-footer">
-      <button class="btn-cancel" on:click={cancel}>취소</button>
-      <button class="btn-apply" on:click={applyCrop} disabled={!imgLoaded}>적용</button>
+      <button class="btn-cancel" on:click={cancel}>{$t.common.cancel}</button>
+      <button class="btn-apply" on:click={applyCrop} disabled={!imgLoaded}>{$t.common.add === 'Add' ? 'Apply' : '적용'}</button>
     </div>
   </div>
 </div>

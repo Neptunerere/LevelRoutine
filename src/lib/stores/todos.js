@@ -1,5 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import { profile } from './profile.js';
+import { t } from '$lib/i18n/index.js';
 
 /**
  * @typedef {'low' | 'medium' | 'high'} Priority
@@ -107,10 +108,11 @@ export const todos = {
       if (completing && profile.isLoaded()) {
         // 기본 XP
         let xp = 10;
-        let reason = `"${current.title}" 완료`;
+        const _t = get(t);
+        let reason = `"${current.title}" ${_t.common.add === 'Add' ? 'completed' : '완료'}`;
 
         // 우선순위 보너스
-        if (current.priority === 'high')   { xp += 15; reason += ' (긴급 보너스)'; }
+        if (current.priority === 'high')   { xp += 15; reason += _t.common.add === 'Add' ? ' (urgent bonus)' : ' (긴급 보너스)'; }
         else if (current.priority === 'medium') { xp += 5; }
 
         profile.addXp(xp, reason);
@@ -125,12 +127,13 @@ export const todos = {
           t.id === id ? completing : t.completed
         );
         if (allDone) {
-          profile.addXp(30, '오늘 할일 전체 완료 보너스 🎉');
+          profile.addXp(30, get(t).common.add === 'Add' ? 'All tasks done today 🎉' : '오늘 할일 전체 완료 보너스 🎉');
         }
       } else if (!completing && profile.isLoaded()) {
         // 완료 취소 시 XP 차감
         let xp = current.priority === 'high' ? -15 : -10;
-        profile.addXp(xp, `"${current.title}" 완료 취소`);
+        const _t2 = get(t);
+        profile.addXp(xp, `"${current.title}" ${_t2.common.add === 'Add' ? 'uncompleted' : '완료 취소'}`);
       }
     } catch (e) {
       _todos.update(list => list.map(t => t.id === id ? current : t));

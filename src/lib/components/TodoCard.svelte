@@ -2,15 +2,17 @@
   import { todos } from '$lib/stores/todos';
   import { createEventDispatcher } from 'svelte';
   import MemberAvatars from './MemberAvatars.svelte';
+  import { t } from '$lib/i18n/index.js';
 
   export let todo;
   const dispatch = createEventDispatcher();
 
-  const priorityLabels = { high: '긴급', medium: '보통', low: '여유' };
-  const categoryLabels = { work: '업무', personal: '개인', health: '건강', study: '학습', other: '기타' };
+  $: priorityLabels = $t.card.priorities;
+  $: _tCard = $t.card; // 함수 안에서 쓰기 위한 변수
+  $: categoryLabels = $t.card.categories;
   const categoryIcons  = { work: '💼', personal: '✨', health: '💚', study: '📚', other: '🎯' };
   const typeIcon       = { single: '◎', timed: '⏱', range: '↔' };
-  const typeLabel      = { single: '당일', timed: '시간', range: '기간' };
+  $: typeLabel = $t.card.typeLabels;
 
   function formatDateRange(t) {
     if (t.scheduleType === 'range' && t.startDate && t.endDate) {
@@ -25,10 +27,10 @@
       const d = new Date(t.dueDate);
       const today = new Date(new Date().toDateString());
       const diff = Math.round((d - today) / 86400000);
-      if (diff === 0) return '오늘';
-      if (diff === 1) return '내일';
-      if (diff < 0) return `${Math.abs(diff)}일 전`;
-      return `${diff}일 후`;
+      if (diff === 0) return _tCard ? _tCard.today : '오늘';
+      if (diff === 1) return _tCard ? _tCard.tomorrow : '내일';
+      if (diff < 0) return _tCard ? _tCard.daysAgo(Math.abs(diff)) : `${Math.abs(diff)}일 전`;
+      return _tCard ? _tCard.daysLater(diff) : `${diff}일 후`;
     }
     return null;
   }
@@ -60,12 +62,12 @@
       {#if todo.meetingType === 'online'}
         <span class="meeting-badge online">
           <svg viewBox="0 0 10 10" fill="none" width="8" height="8"><rect x="1" y="2.5" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M3.5 5h3M5 4v2" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
-          온라인
+          {$t.card.online}
         </span>
       {:else if todo.meetingType === 'offline'}
         <span class="meeting-badge offline">
           <svg viewBox="0 0 10 10" fill="none" width="8" height="8"><path d="M5 1C3.62 1 2.5 2.12 2.5 3.5c0 2.08 2.5 5.5 2.5 5.5s2.5-3.42 2.5-5.5C7.5 2.12 6.38 1 5 1z" stroke="currentColor" stroke-width="1.2" fill="currentColor" fill-opacity="0.15"/><circle cx="5" cy="3.5" r="1" stroke="currentColor" stroke-width="1"/></svg>
-          오프라인
+          {$t.card.offline}
         </span>
       {/if}
 
@@ -137,7 +139,7 @@
   .check-btn.checked { background: var(--accent); border-color: var(--accent); }
   .check-btn svg { width: 10px; height: 10px; }
 
-  .body { flex: 1; min-width: 0; }
+  .body { flex: 1; min-width: 0; overflow: hidden; }
   .meta { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
   .cat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
   .cat { font-size: 12px; color: var(--text-3); }
@@ -185,7 +187,7 @@
   }
   .date-label.overdue { color: var(--high); }
 
-  .card-members { display: flex; align-items: center; margin-top: 4px; }
+  .card-members { display: flex; align-items: center; margin-top: 4px; overflow: hidden; max-width: 100%; }
 
   .actions { display: flex; gap: 2px; opacity: 0; transition: opacity 0.15s; }
   .card:hover .actions { opacity: 1; }
